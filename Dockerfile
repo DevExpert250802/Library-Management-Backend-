@@ -1,24 +1,25 @@
-# Stage 1: Build and publish
+# Stage 1: Build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy and restore only the .csproj (using JSON syntax for the space)
+# Copy and restore dependencies
 COPY ["Library Management/Library Management.csproj", "./"]
 RUN dotnet restore "./Library Management.csproj"
 
-# Copy the rest of the code
+# Copy entire source code
 COPY . .
 
-# Publish, disabling automatic generation of assembly attributes
+# ✅ Remove duplicate assembly attribute file (precaution)
+RUN rm -f /src/obj/Release/net8.0/*.AssemblyAttributes.cs
+
+# Publish the project
 RUN dotnet publish "./Library Management.csproj" \
-    -c Release -o /app/out \
-    /p:GenerateAssemblyInfo=false
+    -c Release -o /app/out
 
-# Stage 2: Runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+# Stage 2: Runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
+COPY --from=build /app/out ./
 
-COPY --from=build /app/out .
-
-EXPOSE 80
+# Set the entrypoint
 ENTRYPOINT ["dotnet", "Library Management.dll"]
