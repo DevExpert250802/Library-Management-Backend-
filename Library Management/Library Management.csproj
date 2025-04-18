@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Library_Management</RootNamespace>
 
-    <!-- Disable auto‑generated assembly attributes to avoid duplicates -->
+    <!-- ✅ Prevent duplicate TargetFrameworkAttribute -->
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
