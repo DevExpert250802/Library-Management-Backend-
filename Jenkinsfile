@@ -14,31 +14,31 @@ pipeline {
 
         stage('Restore Dependencies') {
             steps {
-                sh 'dotnet restore'
+                bat 'dotnet restore'
             }
         }
 
         stage('Build') {
             steps {
-                sh 'dotnet build --configuration Release'
+                bat 'dotnet build --configuration Release'
             }
         }
 
         stage('Publish') {
             steps {
-                sh 'dotnet publish -c Release -o out'
+                bat 'dotnet publish -c Release -o out'
             }
         }
 
         stage('Docker Build') {
             steps {
-                sh 'docker build -t ${IMAGE_NAME}:latest .'
+                bat "docker build -t %IMAGE_NAME%:latest ."
             }
         }
 
         stage('Docker Run') {
             steps {
-                sh 'docker run -d -p 8080:80 --name library-backend ${IMAGE_NAME}:latest'
+                bat "docker run -d -p 8080:80 --name library-backend %IMAGE_NAME%:latest"
             }
         }
     }
