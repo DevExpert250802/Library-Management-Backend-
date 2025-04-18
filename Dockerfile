@@ -2,13 +2,17 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy csproj (use JSON array so Docker handles the space)
+# Copy and restore only the .csproj (using JSON syntax for the space)
 COPY ["Library Management/Library Management.csproj", "./"]
 RUN dotnet restore "./Library Management.csproj"
 
-# Copy everything else and publish
+# Copy the rest of the code
 COPY . .
-RUN dotnet publish "./Library Management.csproj" -c Release -o /app/out
+
+# Publish, disabling automatic generation of assembly attributes
+RUN dotnet publish "./Library Management.csproj" \
+    -c Release -o /app/out \
+    /p:GenerateAssemblyInfo=false
 
 # Stage 2: Runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
